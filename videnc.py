@@ -10,9 +10,7 @@ def blank():
   return b'\x00'
 
 # TODO find a better way to encode these
-# TODO IMPORTANT: I DISABLED THIS TO DEBUG PROGRAM
 def delta_rle(byts, prev):
-  return None
   if prev is None:
     return None
   # The idea: get the XOR of the bytes, then RLE compress it
