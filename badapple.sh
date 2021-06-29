@@ -11,12 +11,12 @@ youtube-dl https://www.youtube.com/watch?v=FtutLA63Cp8 -o bad
 
 echo "Converting video..."
 # Convert video to two tone black and white
-ffmpeg -hide_banner -loglevel error -y -i bad.mkv -vf "fps=$FPS,scale=$VID_SIZE,format=monob" -f rawvideo bad_mono
+ffmpeg -hide_banner -loglevel error -y -i bad.mkv -vf "fps=$FPS,scale=$VID_SIZE,format=monow" -f rawvideo bad_mono
 du -bsh bad_mono | cut -f -1
 
 # Script to encode the video
 echo "Encoding video..."
-python3 videnc.py $W $H
+python videnc.py $W $H
 du -bsh bad_mono.enc | cut -f -1
 
 # Compile decoder
@@ -29,4 +29,4 @@ decoder/decoder | cmp - bad_mono
 
 # Display decoded video
 echo "Displaying decoded video..."
-decoder/decoder | ffplay -hide_banner -loglevel error -f rawvideo -pixel_format monob -video_size $VID_SIZE -framerate $FPS pipe:
+#decoder/decoder | ffplay -hide_banner -loglevel error -f rawvideo -pixel_format monow -video_size $VID_SIZE -framerate $FPS pipe:
