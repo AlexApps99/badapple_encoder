@@ -20,11 +20,10 @@ static void rle_dec(uint8_t data) {
     } else {
       // Overwrote too much, need to correct
       n -= 8 - offset;
-      pixels += 8 - offset;
       assert(n < 0);
       vram[pixels / 8] &= 0xFF << -n;
       vram[pixels / 8] |= old_vram & ~(0xFF << -n);
-      pixels += n;
+      pixels += 8 - offset + n;
       n = 0;
     }
   }

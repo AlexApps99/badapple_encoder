@@ -1,0 +1,5 @@
+__pycache__/
+bad.*
+bad_mono
+bad_mono.*
+decoder/decoder

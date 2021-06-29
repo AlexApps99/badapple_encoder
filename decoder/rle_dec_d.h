@@ -9,8 +9,6 @@ static void rle_dec_d(uint8_t data) {
     // Set from point unwritten to, to end of byte
     if (on != 0) {
       mask = 0xFF >> offset;
-    } else {
-      mask &= ~(0xFF >> offset);
     }
     // If the rest of the byte is entirely filled
     if (n >= 8 - offset) {
@@ -24,8 +22,7 @@ static void rle_dec_d(uint8_t data) {
       assert(n < 0);
       mask &= 0xFF << -n;
       vram[pixels / 8] ^= mask;
-      pixels += 8 - offset;
-      pixels += n;
+      pixels += 8 - offset + n;
       n = 0;
     }
   }
@@ -39,7 +36,8 @@ static void rle_dec_d(uint8_t data) {
     n -= 8;
   }
   // overlap
-  if (n < 0) {
+  if (n != 0) {
+    assert(n < 0);
     // Overwrote too much, need to correct
     pixels -= 8;
     vram[pixels / 8] = old_vram ^ ((0xFF << -n) * on);
