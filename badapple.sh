@@ -3,29 +3,30 @@
 W=80
 H=64
 VID_SIZE="${W}x${H}"
-FPS=30
+FPS=20
 
 # Download video
+echo "Downloading video..."
 youtube-dl https://www.youtube.com/watch?v=FtutLA63Cp8 -o bad
 
+echo "Converting video..."
 # Convert video to two tone black and white
-# This approach had too much dithering
-#ffmpeg -hide_banner -loglevel error -y -i bad.mkv -vf "fps=$FPS,scale=$VID_SIZE,format=monob" -sws_dither none -f rawvideo worse
-
-# This approach has weird jagged edges and I don't like it much either, oh well...
-ffmpeg -hide_banner -loglevel error -y -i bad.mkv -f lavfi -i color=gray -f lavfi -i color=black -f lavfi -i color=white -lavfi "fps=$FPS,scale=320:240,threshold,scale=$VID_SIZE,format=monob" -sws_dither none -f rawvideo bad_mono
+ffmpeg -hide_banner -loglevel error -y -i bad.mkv -vf "fps=$FPS,scale=$VID_SIZE,format=monob" -f rawvideo bad_mono
+du -bsh bad_mono | cut -f -1
 
 # Script to encode the video
-python3 videnc.py
-
-# Compare file sizes
-du -bsh bad_mono bad_mono.enc
+echo "Encoding video..."
+python3 videnc.py $W $H
+du -bsh bad_mono.enc | cut -f -1
 
 # Compile decoder
-cc decoder/main.c -o decoder/decoder
+echo "Compiling decoder..."
+cc -DW=$W -DH=$H -DNDEBUG -O2 decoder/main.c -o decoder/decoder
 
 # Test decoder against original data
+echo "Testing decoder..."
 decoder/decoder | cmp - bad_mono
 
 # Display decoded video
+echo "Displaying decoded video..."
 decoder/decoder | ffplay -hide_banner -loglevel error -f rawvideo -pixel_format monob -video_size $VID_SIZE -framerate $FPS pipe:

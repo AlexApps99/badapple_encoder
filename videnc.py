@@ -1,4 +1,7 @@
+import sys
 from rle import rle_enc, bits
+
+BYTES_NUM = (int(sys.argv[1]) * int(sys.argv[2])) // 8
 
 
 def fullenc(b):
@@ -9,7 +12,7 @@ def fullenc_rle(b):
   return b'\x02' + b''.join(rle_enc(b))
 
 
-def blank():
+def unchanged():
   return b'\x00'
 
 
@@ -27,26 +30,38 @@ def delta_rle(byts, prev):
   return b'\x03' + b''.join(rle_enc(xored))
 
 
+def blank(b):
+  if b == b"\x00" * BYTES_NUM:
+    return b'\x04'
+  elif b == b"\xFF" * BYTES_NUM:
+    return b'\x05'
+  else:
+    return None
+
+
 # Some more codes could be made:
 # Blank variants that SET a flat color rather than retain previous frames
 def encoder():
   prev_frame = None
 
   with open("bad_mono", "rb") as f:
-    while (byts := f.read((80 * 64) // 8)):
+    while (byts := f.read(BYTES_NUM)):
       if byts == prev_frame:
-        yield blank()
+        yield unchanged()
       else:
-        full = fullenc(byts)
-        rle = fullenc_rle(byts)
-        dlt = delta_rle(byts, prev_frame)
-
-        if dlt is not None and len(dlt) < len(rle) and len(dlt) < len(full):
-          yield dlt
-        elif len(rle) < len(full):
-          yield rle
+        blk = blank(byts)
+        if blk is not None:
+          yield blk
         else:
-          yield full
+          full = fullenc(byts)
+          rle = fullenc_rle(byts)
+          dlt = delta_rle(byts, prev_frame)
+          if dlt is not None and len(dlt) < len(rle) and len(dlt) < len(full):
+            yield dlt
+          elif len(rle) < len(full):
+            yield rle
+          else:
+            yield full
 
         prev_frame = byts
 

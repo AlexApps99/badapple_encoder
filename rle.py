@@ -39,13 +39,13 @@ if __name__ == "__main__":
   with open("bad_mono.rle", "wb") as w:
     for bts in rle_enc(byts): w.write(bts)
 
-  import heatshrink2
+  #import heatshrink2
 
-  with heatshrink2.open('bad_mono.rle.bin', 'wb') as w:
-    with open("bad_mono.rle", "rb") as f:
-      w.write(f.read())
+  #with heatshrink2.open('bad_mono.rle.bin', 'wb') as w:
+  #  with open("bad_mono.rle", "rb") as f:
+  #    w.write(f.read())
 
-  with heatshrink2.open('bad_mono.bin', 'wb') as w:
-    with open("bad_mono", "rb") as f:
-      w.write(f.read())
+  #with heatshrink2.open('bad_mono.bin', 'wb') as w:
+  #  with open("bad_mono", "rb") as f:
+  #    w.write(f.read())
 
